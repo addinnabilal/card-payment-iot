@@ -1,7 +1,8 @@
-from fastapi import FastAPI
-import pyrebase
+from fastapi import FastAPI, HTTPException
+from pyrebase import pyrebase
 import os
 
+# Firebase configuration from environment variables
 firebaseConfig = {
   'apiKey': os.environ.get('API_KEY'),
   'authDomain': os.environ.get('AUTH_DOMAIN'),
@@ -19,16 +20,22 @@ db = firebase.database()
 
 app = FastAPI()
 
-@app.get("/api/python")
-def hello_world():
+@app.get("/api/test")
+def test_api():
     return {"message": "Hello World"}
 
 @app.post("/api/pay")
 def pay():
-    # get the current balance, display to ui, and return if success
+    # Example data to push
     data = {
-    "name": "Mortimer 'Morty' Smith"
+        "name": "Mortimer 'Morty' Smith"
     }
-
-    # Pass the user's idToken to the push method
-    db.child("users").push(data)
+    
+    try:
+        # Push data to 'users' node in the Firebase database
+        results = db.child("users").push(data)
+        # Return the results along with a success message
+        return {"success": True, "data": results}
+    except Exception as e:
+        # Catch and return any errors that occur during the database push
+        raise HTTPException(status_code=500, detail=str(e))
