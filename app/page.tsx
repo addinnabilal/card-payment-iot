@@ -42,8 +42,16 @@ export default function Home() {
     if (showTransaction) {
       fetch(`/api/transactions/${client_id}`)
         .then((res) => res.json())
-        .then((data) => {         
-          setTransactions(data);
+        .then((data) => {      
+          const transactions = data.transactions.map((transaction: any) => {
+            return {
+              date: transaction.date,
+              amount: transaction.amount,
+              type: transaction.type,
+            };
+          });
+          setTransactions(transactions);
+                   
         }
       );
     }
@@ -104,12 +112,12 @@ export default function Home() {
       </div>
 
       <div className="mb-32 grid text-center lg:mb-0 lg:grid-cols-2 lg:text-left"
-      onClick={onTopUp}
-      cursor-pointer
       >
 
         <div
           className="group text-center rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
+          onClick={onTopUp}
+          cursor-pointer
         >
           <h2 className={`mb-3 text-2xl font-semibold`}>
             Top up
