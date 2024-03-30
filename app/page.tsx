@@ -43,14 +43,7 @@ export default function Home() {
       fetch(`/api/transactions/${client_id}`)
         .then((res) => res.json())
         .then((data) => {      
-          const transactions = data.transactions.map((transaction: any) => {
-            return {
-              date: transaction.date,
-              amount: transaction.amount,
-              type: transaction.type,
-            };
-          });
-          setTransactions(transactions);
+          setTransactions(data);
                    
         }
       );

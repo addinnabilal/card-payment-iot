@@ -52,6 +52,8 @@ def get_transactions(client_id: str):
     if client is None:
         raise HTTPException(status_code=404, detail="Client not found")
     transactions = client['transactions']
+    # make list of transactions
+    transactions = [transaction for transaction in transactions.values()]
     return transactions
 
 @app.post("/api/pay")
