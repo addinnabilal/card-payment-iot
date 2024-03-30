@@ -18,7 +18,6 @@ export default function Home() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const client_id = urlParams.get('client_id');
-    console.log(client_id);
     if (client_id) {
       setClient_id(client_id);
     }
@@ -41,7 +40,7 @@ export default function Home() {
 
     // Clear interval on component unmount
     return () => clearInterval(intervalId);
-  }, []);
+  }, [client_id]);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
