@@ -4,7 +4,7 @@ import firebase_admin
 import os
 from pydantic import BaseModel
 
-from datetime import date
+import datetime
 
 
 # Firebase configuration from environment variables
@@ -39,19 +39,34 @@ class PaymentRequest(BaseModel):
     client_id: str
     amount: float
 
+@app.get("/api/transactions/{client_id}")
+def get_transactions(client_id: str):
+    ref = db.reference('clients')
+    client = ref.child(client_id).get()
+    if client is None:
+        raise HTTPException(status_code=404, detail="Client not found")
+    transactions = client['transactions']
+    return transactions
+
 @app.post("/api/pay")
 def pay(payment_request: PaymentRequest):
     client_id = payment_request.client_id
     amount = payment_request.amount
+    initial_balance = 145000   
 
-    # get client data from firebase. if not found, add client data
+    # Format the date for the transaction
+    date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    # Get client data from Firebase. If not found, add client data.
     ref = db.reference('clients')
     client = ref.child(client_id).get()
+
+
     if client is None:
         ref.child(client_id).set({
-            'balance': initial_balance,
+            'balance': initial_balance - amount,  # Assuming the first transaction is also deducted
             'transactions': [
-                {  
+                {
                     'date': date,
                     'amount': amount,
                     'type': 'credit'
@@ -59,13 +74,19 @@ def pay(payment_request: PaymentRequest):
             ]
         })
     else:
+        new_balance = client['balance'] - amount
+        if new_balance < 0:
+            # Handle insufficient funds
+            raise HTTPException(status_code=400, detail="Insufficient funds")
         ref.child(client_id).update({
-            'balance': client['balance'] - amount
+            'balance': new_balance
         })
-        ref.child(client_id).child('transactions').push({
+        # Assuming transactions is a list. If it's meant to be a collection of objects, consider a push operation instead.
+        transactions_ref = ref.child(client_id).child('transactions').push()
+        transactions_ref.set({
             'date': date,
             'amount': amount,
             'type': 'credit'
         })
-    
+    return {"message": "Transaction processed successfully."}
     
