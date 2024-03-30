@@ -2,8 +2,8 @@ from fastapi import FastAPI, HTTPException
 from firebase_admin import db,credentials
 import firebase_admin
 import os
+from pydantic import BaseModel
 
-import requests
 from datetime import date
 
 
@@ -35,14 +35,14 @@ app = FastAPI()
 def test_api():
     return {"message": "Hello World"}
 
-@app.post("/api/pay")
-def pay():
-    # get client id, amount from request
-    client_id = requests.json['client_id']
-    amount = requests.json['amount']
-    date = date.today().strftime("%Y-%m-%d")
+class PaymentRequest(BaseModel):
+    client_id: str
+    amount: float
 
-    initial_balance = 145000
+@app.post("/api/pay")
+def pay(payment_request: PaymentRequest):
+    client_id = payment_request.client_id
+    amount = payment_request.amount
 
     # get client data from firebase. if not found, add client data
     ref = db.reference('clients')
