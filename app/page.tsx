@@ -35,7 +35,7 @@ export default function Home() {
   const onShowTransaction = () => {
     setShowTransaction(!showTransaction);
     if (showTransaction) {
-      fetch('/api/transactions')
+      fetch(`/api/transactions/${client_id}`)
         .then((res) => res.json())
         .then((data) => {
           setTransactions(data.transactions);

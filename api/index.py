@@ -126,8 +126,7 @@ def pay(payment_request: PaymentRequest):
 
 
 @app.post("/api/topup")
-def topup(client_id: str)
-    client_id = client_id
+def topup(client_id: str):
     amount = 50000
 
     # Format the date for the transaction
