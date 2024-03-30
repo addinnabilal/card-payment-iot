@@ -26,8 +26,9 @@ export default function Home() {
   // Function to fetch the latest transactions and balance based on the client_id
   const fetchTransactions = async () => {
     if (client_id) {
-      const response = await fetch(`/api/transactions?client_id=${client_id}`);
+      const response = await fetch(`/api/transactions/{client_id}`);
       const data = await response.json();
+      setBalance(data.balance);
       setTransactions(data.transactions);
       setBalance(data.balance);
     }
@@ -57,7 +58,8 @@ export default function Home() {
         {/* Container for the remaining balance */}
         <div className="z-10 mt-4 flex flex-col items-center justify-center w-full md:w-80 h-20 bg-white shadow-lg rounded-lg">
           <p className="text-lg font-semibold">Remaining balance:</p>
-          <span className="text-xl font-bold">$0.00</span> {/* Example amount */}
+          {/* get balancefromstate*/}
+          <span className="text-xl font-bold">{balance}</span>
         </div>
       </div>
 
