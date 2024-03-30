@@ -39,7 +39,7 @@ export default function Home() {
   // use effect to fetch transactions history, depend on ahowTransaction
   useEffect(() => {
     if (showTransaction) {
-      fetch('/api/transactions')
+      fetch(`/api/transactions/${client_id}`)
         .then((res) => res.json())
         .then((data) => {         
           setTransactions(data);
@@ -101,7 +101,10 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="mb-32 grid text-center lg:mb-0 lg:grid-cols-2 lg:text-left">
+      <div className="mb-32 grid text-center lg:mb-0 lg:grid-cols-2 lg:text-left"
+      onClick={onTopUp}
+      cursor-pointer
+      >
 
         <div
           className="group text-center rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
