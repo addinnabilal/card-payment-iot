@@ -10,6 +10,7 @@ interface Transaction {
 }
 
 
+
 export default function Home() {
   const [client_id, setClient_id] = useState<string>(""); 
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -46,6 +47,7 @@ export default function Home() {
         }
       );
     }
+    console.log("transactions", transactions);
   }
   , [showTransaction]);
  

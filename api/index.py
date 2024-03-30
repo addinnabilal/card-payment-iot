@@ -119,10 +119,14 @@ def pay(payment_request: PaymentRequest):
             })
     return {"message": "Transaction processed successfully."}
 
-
+class TopupRequest(BaseModel):
+    client_id: str
 
 @app.post("/api/topup")
-def topup(client_id: str):
+def topup(
+    topup_request: TopupRequest
+):
+    client_id = topup_request.client_id
     amount = 50000
 
     # Format the date for the transaction
