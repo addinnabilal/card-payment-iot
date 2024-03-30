@@ -34,14 +34,21 @@ export default function Home() {
 
   const onShowTransaction = () => {
     setShowTransaction(!showTransaction);
+  }
+
+  // use effect to fetch transactions history, depend on ahowTransaction
+  useEffect(() => {
     if (showTransaction) {
-      fetch(`/api/transactions/${client_id}`)
+      fetch('/api/transactions')
         .then((res) => res.json())
-        .then((data) => {
-          setTransactions(data.transactions);
-        });
+        .then((data) => {         
+          setTransactions(data);
+        }
+      );
     }
   }
+  , [showTransaction]);
+ 
 
   // Function to fetch the latest transactions and balance based on the client_id
   const fetchLastTransaction  = () => {
@@ -120,7 +127,7 @@ export default function Home() {
           </p>
         </div>
         <div className="flex-col col-span-2 items-center justify-center ">
-          { showTransaction? transactions.map((transaction, index) => (
+          { showTransaction && transactions.length > 0 ? transactions.map((transaction, index) => (
             <div key={index} className="flex mb-10 bg-gray items-center justify-between w-full p-4 shadow-lg rounded-lg  border-gray-300">
               <div>
                 <p className="text-sm font-semibold">{transaction.date}</p>

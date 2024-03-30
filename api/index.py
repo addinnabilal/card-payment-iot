@@ -52,10 +52,6 @@ def get_transactions(client_id: str):
     if client is None:
         raise HTTPException(status_code=404, detail="Client not found")
     transactions = client['transactions']
-    {
-        "remaining_balance": client['balance'],
-        "transactions": transactions
-    }
     return transactions
 
 @app.post("/api/pay")
