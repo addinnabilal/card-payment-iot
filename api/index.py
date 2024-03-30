@@ -1,20 +1,24 @@
 from fastapi import FastAPI, HTTPException
-from pyrebase import pyrebase
+import firebase_admin
+from firebase_admin import credentials, db
+import os
 
+# Firebase configuration from environment variables
 firebaseConfig = {
-  'apiKey': "AIzaSyDqaMaVIJxlgV5Ob3cvnpoY2mbOc-hmYpw",
-  'authDomain': "card-payment-iot.firebaseapp.com",
-  'databaseURL': "https://card-payment-iot-default-rtdb.asia-southeast1.firebasedatabase.app",
-  'projectId': "card-payment-iot",
-  'storageBucket': "card-payment-iot.appspot.com",
-  'messagingSenderId': "1044993620317",
-  'appId': "1:1044993620317:web:ca1ca81f7e845ba94410b4",
-  'measurementId': "G-907NCNNEH5"
-};
+  'apiKey': os.environ.get('API_KEY'),
+  'authDomain': os.environ.get('AUTH_DOMAIN'),
+  'databaseURL': os.environ.get('DATABASE_URL'),
+  'projectId': os.environ.get('PROJECT_ID'),
+  'storageBucket': os.environ.get('STORAGE_BUCKET'),
+  'messagingSenderId': os.environ.get('MESSAGING_SENDER_ID'),
+  'appId': os.environ.get('APP_ID'),
+  'measurementId': os.environ.get('MEASUREMENT_ID')
+}
 
-firebase = pyrebase.initialize_app(firebaseConfig)
-auth = firebase.auth()
-db = firebase.database()
+cred = credentials.Certificate(firebaseConfig)
+firebase_admin.initialize_app(cred,{
+    'databaseURL': os.getenv("FIREBASE_DATABASE_URL")
+})
 
 app = FastAPI()
 
@@ -31,9 +35,9 @@ def pay():
     
     try:
         # Push data to 'users' node in the Firebase database
-        # results = db.child("users").push(data)
+        results = db.child("users").push(data)
         # Return the results along with a success message
-        return {"success": True, "data": "test"}
+        return {"success": True, "data": results}
     except Exception as e:
         # Catch and return any errors that occur during the database push
         raise HTTPException(status_code=500, detail=str(e))
