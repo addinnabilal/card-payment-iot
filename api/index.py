@@ -55,7 +55,7 @@ def pay(payment_request: PaymentRequest):
     initial_balance = 145000   
 
     # Format the date for the transaction
-    date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    date = datetime.date.today().strftime("%Y-%m-%d")
 
     # Get client data from Firebase. If not found, add client data.
     ref = db.reference('clients')
