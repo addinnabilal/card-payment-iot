@@ -69,7 +69,7 @@ def pay(payment_request: PaymentRequest):
 
     # Get client data from Firebase. If not found, add client data.
     ref = db.reference('clients')
-    ref_latest = db.reference('/latest_transaction')
+    ref_last = db.reference('/last_transaction')
     client = ref.child(client_id).get()
 
     transaction = {
@@ -86,17 +86,17 @@ def pay(payment_request: PaymentRequest):
             ]
         })
         # store in the last transaction
-        if ref_latest.get() is None:
-            ref_latest.set({
+        if ref_last.get() is None:
+            ref_last.set({
                 'client_id': client_id,
                 'balance': client['balance'] ,
-                'last_transaction': transaction
+                'transaction': transaction
             })
         else:
-            ref_latest.update({
+            ref_last.update({
                 'client_id': client_id,
                  'balance': client['balance'] ,
-                'last_transaction': transaction
+                'transaction': transaction
             })
     else:
         new_balance = client['balance'] - amount
@@ -109,17 +109,17 @@ def pay(payment_request: PaymentRequest):
         # Assuming transactions is a list. If it's meant to be a collection of objects, consider a push operation instead.
         transactions_ref = ref.child(client_id).child('transactions').push()
         transactions_ref.set(transaction)
-        if ref_latest.get() is None:
-            ref_latest.set({
+        if ref_last.get() is None:
+            ref_last.set({
                 'client_id': client_id,
                 'balance': client['balance'] ,
-                'last_transaction': transaction
+                'transaction': transaction
             })
         else:
-            ref_latest.update({
+            ref_last.update({
                 'client_id': client_id,
                 'balance': client['balance'] ,
-                'last_transaction': transaction
+                'transaction': transaction
             })
     return {"message": "Transaction processed successfully."}
     

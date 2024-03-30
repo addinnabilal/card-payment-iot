@@ -25,9 +25,9 @@ export default function Home() {
           return;
         }
         const last_transaction = {
-          date: data.last_transaction.date,
-          amount: data.last_transaction.amount,
-          type: data.last_transaction.type,
+          date: data.transaction.date,
+          amount: data.transaction.amount,
+          type: data.transaction.type,
         };
         setLast_transaction(last_transaction);
         setClient_id(data.client_id);
