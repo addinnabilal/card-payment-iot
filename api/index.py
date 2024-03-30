@@ -79,8 +79,9 @@ def pay(payment_request: PaymentRequest):
     }
 
     if client is None:
+        new_balance = initial_balance - amount
         ref.child(client_id).set({
-            'balance': initial_balance - amount,  # Assuming the first transaction is also deducted
+            'balance': new_balance,  # Assuming the first transaction is also deducted
             'transactions': [
                 transaction
             ]
@@ -89,13 +90,13 @@ def pay(payment_request: PaymentRequest):
         if ref_last.get() is None:
             ref_last.set({
                 'client_id': client_id,
-                'balance': client['balance'] ,
+                'balance': new_balance ,
                 'transaction': transaction
             })
         else:
             ref_last.update({
                 'client_id': client_id,
-                 'balance': client['balance'] ,
+                 'balance': new_balance ,
                 'transaction': transaction
             })
     else:
@@ -106,19 +107,18 @@ def pay(payment_request: PaymentRequest):
         ref.child(client_id).update({
             'balance': new_balance
         })
-        # Assuming transactions is a list. If it's meant to be a collection of objects, consider a push operation instead.
         transactions_ref = ref.child(client_id).child('transactions').push()
         transactions_ref.set(transaction)
         if ref_last.get() is None:
             ref_last.set({
                 'client_id': client_id,
-                'balance': client['balance'] ,
+                'balance': new_balance,
                 'transaction': transaction
             })
         else:
             ref_last.update({
                 'client_id': client_id,
-                'balance': client['balance'] ,
+                'balance': new_balance,
                 'transaction': transaction
             })
     return {"message": "Transaction processed successfully."}

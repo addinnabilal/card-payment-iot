@@ -37,8 +37,8 @@ export default function Home() {
 
   useEffect(() => {
     fetchLastTransaction();
-    // Set up polling every 30 seconds
-    const intervalId = setInterval(fetchLastTransaction, 1000);
+    // Set up polling every 3 seconds
+    const intervalId = setInterval(fetchLastTransaction, 3000);
 
     // Clear interval on component unmount
     return () => clearInterval(intervalId);
@@ -54,11 +54,14 @@ export default function Home() {
       
       <div className="relative flex flex-col items-center justify-center p-4 before:absolute before:inset-0 before:-z-10 before:rounded-lg before:bg-gradient-to-br before:from-transparent before:via-transparent before:to-blue-500 before:blur-2xl after:absolute after:inset-0 after:-z-20 after:rounded-lg after:bg-gradient-to-br after:from-blue-200 after:to-blue-700 after:blur-3xl">
         {/* Message about the payment */}
-        <p className="z-10 text-2xl font-semibold text-center">You paid</p>
-        
+        <p className="z-10 text-2xl font-semibold text-center black">{
+          last_transaction?.type === "debit"
+            ? `You paid $${last_transaction?.amount} on ${last_transaction?.date}`
+            : `You top up $${last_transaction?.amount} on ${last_transaction?.date}`
+        }</p>
         {/* Container for the remaining balance */}
-        <div className="z-10 mt-4 flex flex-col items-center justify-center w-full md:w-80 h-20 bg-white shadow-lg rounded-lg">
-          <p className="text-lg font-semibold">Remaining balance:{balance}</p>
+        <div className="z-10 mt-4 flex flex-col items-center justify-center w-full md:w-80 h-20 bg-black shadow-lg rounded-lg">
+          <p className="text-sm font-semibold">Remaining balance:</p>
           {/* get balancefromstate*/}
           <span className="text-xl font-bold">{balance}</span>
         </div>
