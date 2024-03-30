@@ -13,31 +13,32 @@ export default function Home() {
   const [client_id, setClient_id] = useState<string>(""); 
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [balance, setBalance] = useState<number>(0);
+  const [last_transaction, setLast_transaction] = useState<Transaction | null>(null); // [1
 
-  // get client_id from the URL
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const client_id = urlParams.get('client_id');
-    if (client_id) {
-      setClient_id(client_id);
-    }
-  }, []);
 
   // Function to fetch the latest transactions and balance based on the client_id
-  const fetchTransactions = async () => {
-    if (client_id) {
-      const response = await fetch(`/api/transactions/{client_id}`);
-      const data = await response.json();
-      setBalance(data.balance);
-      setTransactions(data.transactions);
-      setBalance(data.balance);
-    }
-  };
+  const fetchLastTransaction  = () => {
+    fetch('/api/last_transaction')
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data.client_id) {
+          return;
+        }
+        const last_transaction = {
+          date: data.last_transaction.date,
+          amount: data.last_transaction.amount,
+          type: data.last_transaction.type,
+        };
+        setLast_transaction(last_transaction);
+        setClient_id(data.client_id);
+        setBalance(data.balance);
+      });
+  }
 
   useEffect(() => {
-    fetchTransactions();
+    fetchLastTransaction();
     // Set up polling every 30 seconds
-    const intervalId = setInterval(fetchTransactions, 1000);
+    const intervalId = setInterval(fetchLastTransaction, 1000);
 
     // Clear interval on component unmount
     return () => clearInterval(intervalId);
@@ -53,11 +54,11 @@ export default function Home() {
       
       <div className="relative flex flex-col items-center justify-center p-4 before:absolute before:inset-0 before:-z-10 before:rounded-lg before:bg-gradient-to-br before:from-transparent before:via-transparent before:to-blue-500 before:blur-2xl after:absolute after:inset-0 after:-z-20 after:rounded-lg after:bg-gradient-to-br after:from-blue-200 after:to-blue-700 after:blur-3xl">
         {/* Message about the payment */}
-        <p className="z-10 text-2xl font-semibold text-center">You paid x</p>
+        <p className="z-10 text-2xl font-semibold text-center">You paid</p>
         
         {/* Container for the remaining balance */}
         <div className="z-10 mt-4 flex flex-col items-center justify-center w-full md:w-80 h-20 bg-white shadow-lg rounded-lg">
-          <p className="text-lg font-semibold">Remaining balance:</p>
+          <p className="text-lg font-semibold">Remaining balance:{balance}</p>
           {/* get balancefromstate*/}
           <span className="text-xl font-bold">{balance}</span>
         </div>

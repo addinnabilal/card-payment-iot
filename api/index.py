@@ -39,6 +39,12 @@ class PaymentRequest(BaseModel):
     client_id: str
     amount: float
 
+@app.get("/api/last_transaction")
+def get_last_transaction():
+    ref = db.reference('/last_transaction')
+    last_transaction = ref.get()
+    return last_transaction
+
 @app.get("/api/transactions/{client_id}")
 def get_transactions(client_id: str):
     ref = db.reference('clients')
@@ -63,20 +69,35 @@ def pay(payment_request: PaymentRequest):
 
     # Get client data from Firebase. If not found, add client data.
     ref = db.reference('clients')
+    ref_latest = db.reference('/latest_transaction')
     client = ref.child(client_id).get()
 
+    transaction = {
+        'date': date,
+        'amount': amount,
+        'type': 'credit'
+    }
 
     if client is None:
         ref.child(client_id).set({
             'balance': initial_balance - amount,  # Assuming the first transaction is also deducted
             'transactions': [
-                {
-                    'date': date,
-                    'amount': amount,
-                    'type': 'credit'
-                }
+                transaction
             ]
         })
+        # store in the last transaction
+        if ref_latest.get() is None:
+            ref_latest.set({
+                'client_id': client_id,
+                'balance': client['balance'] ,
+                'last_transaction': transaction
+            })
+        else:
+            ref_latest.update({
+                'client_id': client_id,
+                 'balance': client['balance'] ,
+                'last_transaction': transaction
+            })
     else:
         new_balance = client['balance'] - amount
         if new_balance < 0:
@@ -87,10 +108,18 @@ def pay(payment_request: PaymentRequest):
         })
         # Assuming transactions is a list. If it's meant to be a collection of objects, consider a push operation instead.
         transactions_ref = ref.child(client_id).child('transactions').push()
-        transactions_ref.set({
-            'date': date,
-            'amount': amount,
-            'type': 'credit'
-        })
+        transactions_ref.set(transaction)
+        if ref_latest.get() is None:
+            ref_latest.set({
+                'client_id': client_id,
+                'balance': client['balance'] ,
+                'last_transaction': transaction
+            })
+        else:
+            ref_latest.update({
+                'client_id': client_id,
+                'balance': client['balance'] ,
+                'last_transaction': transaction
+            })
     return {"message": "Transaction processed successfully."}
     
