@@ -3,6 +3,10 @@ from firebase_admin import db,credentials
 import firebase_admin
 import os
 
+import requests
+from datetime import date
+
+
 # Firebase configuration from environment variables
 firebaseConfig = {
 'type': 'service_account',
@@ -33,16 +37,35 @@ def test_api():
 
 @app.post("/api/pay")
 def pay():
-    # Example data to push
-    data = {
-        "name": "Mortimer 'Morty' Smith"
-    }
+    # get client id, amount from request
+    client_id = requests.json['client_id']
+    amount = requests.json['amount']
+    date = date.today().strftime("%Y-%m-%d")
+
+    initial_balance = 145000
+
+    # get client data from firebase. if not found, add client data
+    ref = db.reference('clients')
+    client = ref.child(client_id).get()
+    if client is None:
+        ref.child(client_id).set({
+            'balance': initial_balance,
+            'transactions': [
+                {  
+                    'date': date,
+                    'amount': amount,
+                    'type': 'credit'
+                }
+            ]
+        })
+    else:
+        ref.child(client_id).update({
+            'balance': client['balance'] - amount
+        })
+        ref.child(client_id).child('transactions').push({
+            'date': date,
+            'amount': amount,
+            'type': 'credit'
+        })
     
-    try:
-        # Push data to 'users' node in the Firebase database
-        results = db.child("users").push(data)
-        # Return the results along with a success message
-        return {"success": True, "data": results}
-    except Exception as e:
-        # Catch and return any errors that occur during the database push
-        raise HTTPException(status_code=500, detail=str(e))
+    
