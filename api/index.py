@@ -122,4 +122,67 @@ def pay(payment_request: PaymentRequest):
                 'transaction': transaction
             })
     return {"message": "Transaction processed successfully."}
+
+
+
+@app.post("/api/topup")
+def topup(client_id: str)
+    client_id = client_id
+    amount = 50000
+
+    # Format the date for the transaction
+    date = datetime.date.today().strftime("%Y-%m-%d")
+
+    # Get client data from Firebase. If not found, add client data.
+    ref = db.reference('clients')
+    ref_last = db.reference('/last_transaction')
+    client = ref.child(client_id).get()
+
+    transaction = {
+        'date': date,
+        'amount': amount,
+        'type': 'debit'
+    }
+
+    if client is None:
+        new_balance = amount
+        ref.child(client_id).set({
+            'balance': new_balance,
+            'transactions': [
+                transaction
+            ]
+        })
+        # store in the last transaction
+        if ref_last.get() is None:
+            ref_last.set({
+                'client_id': client_id,
+                'balance': new_balance,
+                'transaction': transaction
+            })
+        else:
+            ref_last.update({
+                'client_id': client_id,
+                'balance': new_balance,
+                'transaction': transaction
+            })
+    else:
+        new_balance = client['balance'] + amount
+        ref.child(client_id).update({
+            'balance': new_balance
+        })
+        transactions_ref = ref.child(client_id).child('transactions').push()
+        transactions_ref.set(transaction)
+        if ref_last.get() is None:
+            ref_last.set({
+                'client_id': client_id,
+                'balance': new_balance,
+                'transaction': transaction
+            })
+        else:
+            ref_last.update({
+                'client_id': client_id,
+                'balance': new_balance,
+                'transaction': transaction
+            })
+    return {"message": "Transaction processed successfully."}
     
