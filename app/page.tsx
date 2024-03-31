@@ -17,7 +17,7 @@ export default function Home() {
   const [balance, setBalance] = useState<number>(0);
   const [last_transaction, setLast_transaction] = useState<Transaction | null>(null);
   const [showTransaction, setShowTransaction] = useState<boolean>(false);
-
+  const [isLastTransactionSuccess, setIsLastTransactionSuccess] = useState<boolean>(false);
 
   const onTopUp = () => {
     fetch('/api/topup', {
@@ -69,6 +69,8 @@ export default function Home() {
         setLast_transaction(last_transaction);
         setClient_id(data.client_id);
         setBalance(data.balance);
+        const is_successful = data.is_successful === "true";
+        setIsLastTransactionSuccess(is_successful);
       });
   }
 
@@ -92,9 +94,10 @@ export default function Home() {
       <div className="relative flex flex-col items-center justify-center p-4 before:absolute before:inset-0 before:-z-10 before:rounded-lg before:bg-gradient-to-br before:from-transparent before:via-transparent before:to-blue-500 before:blur-2xl after:absolute after:inset-0 after:-z-20 after:rounded-lg after:bg-gradient-to-br after:from-blue-200 after:to-blue-700 after:blur-3xl">
         {/* Message about the payment */}
         <p className="z-10 text-2xl font-semibold text-center black">{
-          last_transaction?.type === "credit"
-            ? `You paid ${last_transaction?.amount} on ${last_transaction?.date}`
-            : `You top up ${last_transaction?.amount} on ${last_transaction?.date}`
+          /* if last transaction isnt success, show "insufficient fund". if success, check if it is credit or debit */
+          isLastTransactionSuccess ? last_transaction?.type === "debit" ? 
+          `You have successfully topped up ${last_transaction?.amount}` :
+          `You have successfully paid ${last_transaction?.amount}` : "Insufficient fund"
         }</p>
         {/* Container for the remaining balance */}
         <div className="z-10 mt-4 flex flex-col items-center justify-center w-full md:w-80 h-20 bg-black shadow-lg rounded-lg">
@@ -116,7 +119,7 @@ export default function Home() {
             Top up
           </h2>
           <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore the Next.js 13 playground.
+            Top up Rp50.000 to your account.
           </p>
         </div>
 
@@ -126,10 +129,10 @@ export default function Home() {
           cursor-pointer
         >
           <h2 className={`mb-3 text-2xl font-semibold`}>
-            {showTransaction ? "Hide" : "Show"} Transactions
+            {showTransaction ? "Hide" : "Show"} Transaction History
           </h2>
           <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
+            Show your transaction history.
           </p>
         </div>
         <div className="flex-col col-span-2 items-center justify-center ">

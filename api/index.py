@@ -73,7 +73,7 @@ def pay(payment_request: PaymentRequest):
     transaction = {
         'date': date,
         'amount': amount,
-        'type': 'credit'
+        'type': 'credit',
     }
 
     if client is None:
@@ -88,19 +88,35 @@ def pay(payment_request: PaymentRequest):
         if ref_last.get() is None:
             ref_last.set({
                 'client_id': client_id,
-                'balance': new_balance ,
+                'balance': new_balance,
+                'is_successful': 'true', 
                 'transaction': transaction
             })
         else:
             ref_last.update({
                 'client_id': client_id,
-                 'balance': new_balance ,
+                'balance': new_balance,
+                'is_successful': 'true', 
                 'transaction': transaction
             })
     else:
         new_balance = client['balance'] - amount
         if new_balance < 0:
             # Handle insufficient funds
+            if ref_last.get() is None:
+                ref_last.set({
+                    'client_id': client_id,
+                    'balance': client['balance'],
+                    'is_successful': 'false', 
+                    'transaction': transaction
+                })
+            else:
+                ref_last.update({
+                    'client_id': client_id,
+                    'balance': client['balance'],
+                    'is_successful': 'false', 
+                    'transaction': transaction
+                })
             raise HTTPException(status_code=400, detail="Insufficient funds")
         ref.child(client_id).update({
             'balance': new_balance
@@ -111,12 +127,14 @@ def pay(payment_request: PaymentRequest):
             ref_last.set({
                 'client_id': client_id,
                 'balance': new_balance,
+                'is_successful': 'true', 
                 'transaction': transaction
             })
         else:
             ref_last.update({
                 'client_id': client_id,
                 'balance': new_balance,
+                'is_successful': 'true', 
                 'transaction': transaction
             })
     return {"message": "Transaction processed successfully."}
@@ -146,7 +164,7 @@ def topup(
     }
 
     if client is None:
-        new_balance = amount
+        new_balance = amount + 145000
         ref.child(client_id).set({
             'balance': new_balance,
             'transactions': [
@@ -158,12 +176,14 @@ def topup(
             ref_last.set({
                 'client_id': client_id,
                 'balance': new_balance,
+                'is_successful': 'true', 
                 'transaction': transaction
             })
         else:
             ref_last.update({
                 'client_id': client_id,
                 'balance': new_balance,
+                'is_successful': 'true', 
                 'transaction': transaction
             })
     else:
@@ -177,12 +197,14 @@ def topup(
             ref_last.set({
                 'client_id': client_id,
                 'balance': new_balance,
+                'is_successful': 'true',
                 'transaction': transaction
             })
         else:
             ref_last.update({
                 'client_id': client_id,
                 'balance': new_balance,
+                'is_successful': 'true',
                 'transaction': transaction
             })
     return {"message": "Transaction processed successfully."}
