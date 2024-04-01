@@ -22,7 +22,9 @@ firebaseConfig = {
 'universe_domain': "googleapis.com"
 }
 
-
+pay_amount = 20000
+topup_amount = 50000
+initial_balance = 145000   
 
 cred = credentials.Certificate(firebaseConfig)
 firebase_admin.initialize_app(cred,{
@@ -37,7 +39,6 @@ def test_api():
 
 class PaymentRequest(BaseModel):
     client_id: str
-    amount: float
 
 @app.get("/api/last_transaction")
 def get_last_transaction():
@@ -59,8 +60,6 @@ def get_transactions(client_id: str):
 @app.post("/api/pay")
 def pay(payment_request: PaymentRequest):
     client_id = payment_request.client_id
-    amount = payment_request.amount
-    initial_balance = 145000   
 
     # Format the date for the transaction
     date = datetime.date.today().strftime("%Y-%m-%d")
@@ -72,12 +71,12 @@ def pay(payment_request: PaymentRequest):
 
     transaction = {
         'date': date,
-        'amount': amount,
+        'amount': pay_amount,
         'type': 'credit',
     }
 
     if client is None:
-        new_balance = initial_balance - amount
+        new_balance = initial_balance - pay_amount
         ref.child(client_id).set({
             'balance': new_balance,  # Assuming the first transaction is also deducted
             'transactions': [
@@ -100,7 +99,7 @@ def pay(payment_request: PaymentRequest):
                 'transaction': transaction
             })
     else:
-        new_balance = client['balance'] - amount
+        new_balance = client['balance'] - pay_amount
         if new_balance < 0:
             # Handle insufficient funds
             if ref_last.get() is None:
@@ -147,7 +146,7 @@ def topup(
     topup_request: TopupRequest
 ):
     client_id = topup_request.client_id
-    amount = 50000
+
 
     # Format the date for the transaction
     date = datetime.date.today().strftime("%Y-%m-%d")
@@ -159,12 +158,12 @@ def topup(
 
     transaction = {
         'date': date,
-        'amount': amount,
+        'amount': topup_amount,
         'type': 'debit'
     }
 
     if client is None:
-        new_balance = amount + 145000
+        new_balance = topup_amount + 145000
         ref.child(client_id).set({
             'balance': new_balance,
             'transactions': [
@@ -187,7 +186,7 @@ def topup(
                 'transaction': transaction
             })
     else:
-        new_balance = client['balance'] + amount
+        new_balance = client['balance'] + topup_amount
         ref.child(client_id).update({
             'balance': new_balance
         })

@@ -95,15 +95,15 @@ export default function Home() {
         {/* Message about the payment */}
         <p className="z-10 text-2xl font-semibold text-center black">{
           /* if last transaction isnt success, show "insufficient fund". if success, check if it is credit or debit */
-          isLastTransactionSuccess ? last_transaction?.type === "debit" ? 
+          last_transaction ? isLastTransactionSuccess ? last_transaction?.type === "debit" ? 
           `You have successfully topped up ${last_transaction?.amount}` :
-          `You have successfully paid ${last_transaction?.amount}` : "Insufficient fund"
+          `You have successfully paid ${last_transaction?.amount}` : "Insufficient fund" : null
         }</p>
         {/* Container for the remaining balance */}
         <div className="z-10 mt-4 flex flex-col items-center justify-center w-full md:w-80 h-20 bg-black shadow-lg rounded-lg">
           <p className="text-sm font-semibold">Remaining balance:</p>
           {/* get balancefromstate*/}
-          <span className="text-xl font-bold">{balance}</span>
+          <span className="text-xl font-bold">{last_transaction? balance : 0}</span>
         </div>
       </div>
 
