@@ -93,7 +93,10 @@ export default function Home() {
       
       <div className="relative flex flex-col items-center justify-center p-4 before:absolute before:inset-0 before:-z-10 before:rounded-lg before:bg-gradient-to-br before:from-transparent before:via-transparent before:to-blue-500 before:blur-2xl after:absolute after:inset-0 after:-z-20 after:rounded-lg after:bg-gradient-to-br after:from-blue-200 after:to-blue-700 after:blur-3xl">
         {/* Message about the payment */}
-        <p className="z-10 text-2xl font-semibold text-center black">{
+        {/*show client id*/}
+        <p className="z-10 text-2xl font-semibold text-center black">{client_id? `Hi, ${client_id}` : null}</p>
+        {/*show last transaction*/}
+        <p className="z-10 text-xl font-semibold text-center black">{
           /* if last transaction isnt success, show "insufficient fund". if success, check if it is credit or debit */
           last_transaction ? isLastTransactionSuccess ? last_transaction?.type === "debit" ? 
           `You have successfully topped up ${last_transaction?.amount}` :
