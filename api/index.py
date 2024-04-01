@@ -62,7 +62,7 @@ def pay(payment_request: PaymentRequest):
     client_id = payment_request.client_id
 
     # Format the date, time for transaction
-    date_time = datetime.datetime.now()
+    date_time = datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
 
     # Get client data from Firebase. If not found, add client data.
     ref = db.reference('clients')
@@ -148,8 +148,9 @@ def topup(
     client_id = topup_request.client_id
 
 
-    # Format the date for the transaction
-    date_time = datetime.datetime.now()
+    # Format the date for the transactio
+    date_time = datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
+
 
     # Get client data from Firebase. If not found, add client data.
     ref = db.reference('clients')
