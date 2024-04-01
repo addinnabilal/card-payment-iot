@@ -61,8 +61,8 @@ def get_transactions(client_id: str):
 def pay(payment_request: PaymentRequest):
     client_id = payment_request.client_id
 
-    # Format the date for the transaction
-    date = datetime.date.today().strftime("%Y-%m-%d")
+    # Format the date, time for transaction
+    date_time = datetime.datetime.now()
 
     # Get client data from Firebase. If not found, add client data.
     ref = db.reference('clients')
@@ -70,7 +70,7 @@ def pay(payment_request: PaymentRequest):
     client = ref.child(client_id).get()
 
     transaction = {
-        'date': date,
+        'date_time': date_time,
         'amount': pay_amount,
         'type': 'credit',
     }
@@ -149,7 +149,7 @@ def topup(
 
 
     # Format the date for the transaction
-    date = datetime.date.today().strftime("%Y-%m-%d")
+    date_time = datetime.datetime.now()
 
     # Get client data from Firebase. If not found, add client data.
     ref = db.reference('clients')
@@ -157,7 +157,7 @@ def topup(
     client = ref.child(client_id).get()
 
     transaction = {
-        'date': date,
+        'date_time': date_time,
         'amount': topup_amount,
         'type': 'debit'
     }

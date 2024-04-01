@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 
 interface Transaction {
-  date: string;
+  date_time: string;
   amount: number;
   type: string;
 }
@@ -62,7 +62,7 @@ export default function Home() {
           return;
         }
         const last_transaction = {
-          date: data.transaction.date,
+          date_time: data.transaction.date_time,
           amount: data.transaction.amount,
           type: data.transaction.type,
         };
@@ -142,7 +142,7 @@ export default function Home() {
           { showTransaction && transactions.length > 0 ? transactions.map((transaction, index) => (
             <div key={index} className="flex mb-10 bg-gray items-center justify-between w-full p-4 shadow-lg rounded-lg  border-gray-300">
               <div>
-                <p className="text-sm font-semibold">{transaction.date}</p>
+                <p className="text-sm font-semibold">{transaction.date_time}</p>
                 <p className="text-sm">{transaction.type}</p>
               </div>
               <p className="text-sm font-semibold">{transaction.amount}</p>
